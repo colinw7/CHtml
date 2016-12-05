@@ -4,6 +4,7 @@
 #include <CHtmlTypes.h>
 #include <string>
 #include <map>
+#include <set>
 #include <sys/types.h>
 
 #define CHtmlTagDefLookupInst CHtmlTagDefLookup::instance()
@@ -25,10 +26,14 @@ class CHtmlTagDefLookup {
  private:
   typedef std::map<std::string, const CHtmlTagDef *> NameToTag;
   typedef std::map<CHtmlTagId , const CHtmlTagDef *> IdToTag;
+  typedef std::set<CHtmlTagId>                       InlineTags;
 
-  NameToTag nameToTag_;
-  IdToTag   idToTag_;
+  NameToTag  nameToTag_;
+  IdToTag    idToTag_;
+  InlineTags inlineTags_;
 };
+
+//---
 
 class CHtmlTagDef {
  public:
@@ -40,12 +45,16 @@ class CHtmlTagDef {
   const std::string &getName    () const { return name_; }
   CHtmlTextType      getTextType() const { return text_type_; }
 
+  bool isInline() const { return inline_; }
+  void setInline(bool b) { inline_ = b; }
+
   bool isValid() const { return id_ != CHtmlTagId::NONE; }
 
  private:
   CHtmlTagId    id_;
   std::string   name_;
-  CHtmlTextType text_type_;
+  CHtmlTextType text_type_ { CHtmlTextType::NONE };
+  bool          inline_ { false };
 };
 
 #endif

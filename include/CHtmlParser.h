@@ -8,6 +8,7 @@
 #include <vector>
 
 class CHtml;
+class CHtmlTag;
 class CHtmlToken;
 
 class CHtmlParserTokens {
@@ -52,6 +53,7 @@ class CHtmlParser {
   std::string replaceNamedChars(const std::string &value);
 
   void readText();
+  void readScriptText();
 
   bool matchString(const std::string &str);
   void skipSpaces();
@@ -65,16 +67,20 @@ class CHtmlParser {
   void parseError(const char *fmt, ...);
   void parseError(const std::string &str);
 
+  CHtmlTag *currentTag() const;
+
  private:
   CHtmlParser(const CHtmlParser &rhs);
   CHtmlParser &operator=(const CHtmlParser &rhs);
 
  private:
-  typedef std::vector<char> Buffer;
+  typedef std::vector<char>       Buffer;
+  typedef std::vector<CHtmlTag *> TagStack;
 
   const CHtml       &html_;
   CAutoPtr<CFile>    file_;
   CHtmlParserTokens *tokens_ { nullptr };
+  TagStack           tagStack_;
   Buffer             buffer_;
   bool               debug_ { false };
   uint               line_num_ { 1 };

@@ -111,11 +111,28 @@ instance()
 CHtmlTagDefLookup::
 CHtmlTagDefLookup()
 {
+  inlineTags_ = {{ CHtmlTagId::B      , CHtmlTagId::BIG     , CHtmlTagId::I     ,
+                   CHtmlTagId::SMALL  , CHtmlTagId::TT      , CHtmlTagId::ABBR  ,
+                   CHtmlTagId::ACRONYM, CHtmlTagId::CITE    , CHtmlTagId::CODE  ,
+                   CHtmlTagId::DFN    , CHtmlTagId::EM      , CHtmlTagId::KBD   ,
+                   CHtmlTagId::STRONG , CHtmlTagId::SAMP    , CHtmlTagId::TIME  ,
+                   CHtmlTagId::VAR    , CHtmlTagId::A       , CHtmlTagId::BDO   ,
+                   CHtmlTagId::BR     , CHtmlTagId::IMG     , CHtmlTagId::MAP   ,
+                   CHtmlTagId::OBJECT , CHtmlTagId::Q       , CHtmlTagId::SCRIPT,
+                   CHtmlTagId::SPAN   , CHtmlTagId::SUB     , CHtmlTagId::SUP   ,
+                   CHtmlTagId::BUTTON , CHtmlTagId::INPUT   , CHtmlTagId::LABEL ,
+                   CHtmlTagId::SELECT , CHtmlTagId::TEXTAREA }};
+
+  //---
+
   for (uint i = 1; i < numTagDefs; i++) {
-    const CHtmlTagDef &tagDef = tagDefs[i];
+    CHtmlTagDef &tagDef = tagDefs[i];
 
     nameToTag_[tagDef.getName()] = &tagDef;
     idToTag_  [tagDef.getId  ()] = &tagDef;
+
+    if (inlineTags_.find(tagDef.getId()) != inlineTags_.end())
+      tagDef.setInline(true);
   }
 }
 

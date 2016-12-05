@@ -241,6 +241,8 @@ readTag()
       c = readChar();
   }
 
+  //------
+
   CHtmlTag *tag = new CHtmlTag(name, options, end_tag);
 
   CHtmlTagToken *token = new CHtmlTagToken(tag);
@@ -250,6 +252,26 @@ readTag()
                (! tag->getTagDef().isValid() ? " <unknown>" : ""));
 
   tokens_->add(token);
+
+  if      (! end_tag && ! start_end_tag) {
+    tagStack_.push_back(tag);
+  }
+  else if (end_tag) {
+    CHtmlTag *currentTag = this->currentTag();
+
+    if      (! currentTag) {
+      if (debug_)
+        parseError("No current tag for end tag " + tag->getName());
+    }
+    else if (currentTag->getName() != tag->getName()) {
+      if (debug_)
+        parseError("Current open tag " + currentTag->getName() +
+                   " doesn't match end tag " + tag->getName());
+    }
+    else {
+      tagStack_.pop_back();
+    }
+  }
 
   if (! end_tag && start_end_tag) {
     std::vector<CHtmlTagOption *> options;
@@ -476,6 +498,16 @@ void
 CHtmlParser::
 readText()
 {
+  CHtmlTag *currentTag = this->currentTag();
+
+  if (currentTag && CStrUtil::toLower(currentTag->getName()) == "script") {
+    readScriptText();
+
+    return;
+  }
+
+  //---
+
   int c = readChar();
 
   if (c == EOF)
@@ -497,6 +529,61 @@ readText()
   //----
 
   str = replaceNamedChars(str);
+
+  CHtmlText *text = new CHtmlText(str);
+
+  CHtmlTextToken *token = new CHtmlTextToken(text);
+
+  if (debug_)
+    std::cerr << "Text: " << str << std::endl;
+
+  tokens_->add(token);
+}
+
+void
+CHtmlParser::
+readScriptText()
+{
+  int c = readChar();
+
+  std::string str;
+  std::string tagName;
+  bool        inTag = false;
+  bool        endFound = false;
+
+  while (c != EOF) {
+    if      (c == '<') {
+      tagName = "";
+      inTag   = true;
+
+      tagName += c;
+    }
+    else if (c == '>') {
+      if (inTag)
+        tagName += c;
+
+      inTag = false;
+    }
+    else {
+      if (inTag)
+        tagName += tolower(c);
+    }
+
+    str += c;
+
+    if (tagName == "</script>") {
+      endFound = true;
+      break;
+    }
+
+    c = readChar();
+  }
+
+  if (endFound) {
+    str = str.substr(0, str.size() - 9);
+
+    unreadChars("</script>");
+  }
 
   CHtmlText *text = new CHtmlText(str);
 
@@ -647,6 +734,13 @@ CHtmlParser::
 parseError(const std::string &str)
 {
   std::cerr << line_num_ << ":" << char_num_ << "> " << str << std::endl;
+}
+
+CHtmlTag *
+CHtmlParser::
+currentTag() const
+{
+  return (! tagStack_.empty() ? tagStack_.back() : 0);
 }
 
 //--------------
