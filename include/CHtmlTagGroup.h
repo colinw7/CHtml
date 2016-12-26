@@ -11,7 +11,7 @@ class CHtmlTagGroup {
   CHtmlTagGroup(const CHtmlTokenArray &tokens, int *i);
 
  private:
-  CHtmlTagSubGroup *sub_group_ { nullptr };
+  CHtmlTagSubGroup *subGroup_ { nullptr };
 };
 
 //------
@@ -23,10 +23,10 @@ class CHtmlTagSubGroup {
   CHtmlTagSubGroup(const CHtmlTokenArray &tokens, int *i);
 
   void add(CHtmlToken *token);
-  void add(CHtmlTagSubGroup *sub_group);
+  void add(CHtmlTagSubGroup *subGroup);
 
  private:
-  std::vector<CHtmlTagSubGroupValue *> sub_values_;
+  std::vector<CHtmlTagSubGroupValue *> subValues_;
 };
 
 //------
@@ -48,10 +48,10 @@ class CHtmlTagSubGroupToken : public CHtmlTagSubGroupValue {
 
 class CHtmlTagSubGroupSubGroup : public CHtmlTagSubGroupValue {
  public:
-  CHtmlTagSubGroupToken(CHtmlTagSubGroup *sub_group);
+  CHtmlTagSubGroupToken(CHtmlTagSubGroup *subGroup);
 
  private:
-  CHtmlTagSubGroup *sub_group_ { nullptr };
+  CHtmlTagSubGroup *subGroup_ { nullptr };
 };
 
 #endif

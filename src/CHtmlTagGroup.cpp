@@ -3,15 +3,15 @@
 CHtmlTagGroup::
 CHtmlTagGroup(const CHtmlTokenArray &tokens, int *i)
 {
-  sub_group_ = new CHtmlTagSubGroup(tokens, i);
+  subGroup_ = new CHtmlTagSubGroup(tokens, i);
 }
 
 CHtmlTagSubGroup::
 CHtmlTagSubGroup(CHtmlToken *token)
 {
-  CHtmlTagSubGroupToken *sub_value = new CHtmlTagSubGroupToken(token);
+  CHtmlTagSubGroupToken *subValue = new CHtmlTagSubGroupToken(token);
 
-  sub_values_.push_back(sub_value);
+  subValues_.push_back(subValue);
 }
 
 CHtmlTagSubGroup::
@@ -25,9 +25,9 @@ CHtmlTagSubGroup(const CHtmlTokenArray &tokens, int *i)
   CHtmlToken *token = tokens[(*i)++];
 
   if (! token->isTag()) {
-    CHtmlTagSubGroupToken *sub_value = new CHtmlTagSubGroupToken(token);
+    CHtmlTagSubGroupToken *subValue = new CHtmlTagSubGroupToken(token);
 
-    sub_values_.push_back(sub_value);
+    subValues_.push_back(subValue);
 
     return;
   }
@@ -35,20 +35,20 @@ CHtmlTagSubGroup(const CHtmlTokenArray &tokens, int *i)
   CHtmlTag *tag = token->getTag()->getTag();
 
   if (tag->getIsEndTag()) {
-    CHtmlTagSubGroupToken *sub_value = new CHtmlTagSubGroupToken(token);
+    CHtmlTagSubGroupToken *subValue = new CHtmlTagSubGroupToken(token);
 
-    sub_values_.push_back(sub_value);
+    subValues_.push_back(subValue);
 
     return;
   }
 
-  CHtmlTagSubGroup *sub_group = new CHtmlTagSubGroup(token);
+  CHtmlTagSubGroup *subGroup = new CHtmlTagSubGroup(token);
 
   while (*i < num_tokens) {
     token = tokens[(*i)++];
 
     if (! token->isTag()) {
-      sub_group->add(token);
+      subGroup->add(token);
 
       continue;
     }
@@ -56,9 +56,9 @@ CHtmlTagSubGroup(const CHtmlTokenArray &tokens, int *i)
     CHtmlTag *tag1 = token->getTag()->getTag();
 
     if (tag->getName() != tag1->getName() || ! tag1->getIsEndTag())
-      CHtmlTagSubGroup *sub_group1 = CHtmlTagSubGroup(tokens, i);
+      CHtmlTagSubGroup *subGroup1 = CHtmlTagSubGroup(tokens, i);
 
-      sub_group->add(sub_group1);
+      subGroup->add(subGroup1);
 
       continue;
     }
@@ -66,7 +66,7 @@ CHtmlTagSubGroup(const CHtmlTokenArray &tokens, int *i)
     break;
   }
 
-  CHtmlTagSubGroupSubGroup *sub_value = new CHtmlTagSubGroupSubGroup(sub_group);
+  CHtmlTagSubGroupSubGroup *subValue = new CHtmlTagSubGroupSubGroup(subGroup);
 
-  sub_values_.push_back(sub_value);
+  subValues_.push_back(subValue);
 }

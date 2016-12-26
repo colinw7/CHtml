@@ -37,13 +37,13 @@ class CHtmlTagDefLookup {
 
 class CHtmlTagDef {
  public:
-  CHtmlTagDef(CHtmlTagId id, const std::string &name, CHtmlTextType text_type) :
-   id_(id), name_(name), text_type_(text_type) {
+  CHtmlTagDef(CHtmlTagId id, const std::string &name, CHtmlTextType textType) :
+   id_(id), name_(name), textType_(textType) {
   }
 
   CHtmlTagId         getId      () const { return id_; }
   const std::string &getName    () const { return name_; }
-  CHtmlTextType      getTextType() const { return text_type_; }
+  CHtmlTextType      getTextType() const { return textType_; }
 
   bool isInline() const { return inline_; }
   void setInline(bool b) { inline_ = b; }
@@ -53,7 +53,7 @@ class CHtmlTagDef {
  private:
   CHtmlTagId    id_;
   std::string   name_;
-  CHtmlTextType text_type_ { CHtmlTextType::NONE };
+  CHtmlTextType textType_ { CHtmlTextType::NONE };
   bool          inline_ { false };
 };
 

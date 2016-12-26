@@ -4,7 +4,7 @@
 
 CHtmlNamedChar
 CHtmlNamedCharMgr::
-named_chars_[] = {
+namedChars_[] = {
   CHtmlNamedChar("AElig" , 198, "\u00c6"),
   CHtmlNamedChar("Aacute", 193, "\u00c1"),
   CHtmlNamedChar("Acirc" , 194, "\u00c2"),
@@ -108,8 +108,8 @@ named_chars_[] = {
   CHtmlNamedChar("yuml"  , 255, "\u00ff"),
 };
 
-uint CHtmlNamedCharMgr::num_named_chars_ =
-  sizeof(CHtmlNamedCharMgr::named_chars_)/sizeof(CHtmlNamedCharMgr::named_chars_[0]);
+uint CHtmlNamedCharMgr::numNamedChars_ =
+  sizeof(CHtmlNamedCharMgr::namedChars_)/sizeof(CHtmlNamedCharMgr::namedChars_[0]);
 
 CHtmlNamedCharMgr *
 CHtmlNamedCharMgr::
@@ -125,11 +125,11 @@ getInstance()
 
 CHtmlNamedCharMgr::
 CHtmlNamedCharMgr() :
- name_value_map_(), value_name_map_()
+ nameValueMap_(), valueNameMap_()
 {
-  for (uint i = 1; i < num_named_chars_; ++i) {
-    name_value_map_[named_chars_[i].name ] = &named_chars_[i];
-    value_name_map_[named_chars_[i].value] = &named_chars_[i];
+  for (uint i = 0; i < numNamedChars_; ++i) {
+    nameValueMap_[namedChars_[i].name ] = &namedChars_[i];
+    valueNameMap_[namedChars_[i].value] = &namedChars_[i];
   }
 }
 
@@ -137,9 +137,9 @@ bool
 CHtmlNamedCharMgr::
 lookup(const std::string &name, CHtmlNamedChar **named_char) const
 {
-  auto p = name_value_map_.find(name);
+  auto p = nameValueMap_.find(name);
 
-  if (p == name_value_map_.end())
+  if (p == nameValueMap_.end())
     return false;
 
   *named_char = p->second;
@@ -151,9 +151,9 @@ bool
 CHtmlNamedCharMgr::
 lookup(int value, CHtmlNamedChar **named_char) const
 {
-  auto p = value_name_map_.find(value);
+  auto p = valueNameMap_.find(value);
 
-  if (p == value_name_map_.end())
+  if (p == valueNameMap_.end())
     return false;
 
   *named_char = p->second;

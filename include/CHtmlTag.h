@@ -35,16 +35,16 @@ class CHtmlTag {
 
   const CHtmlTagOption *getOption(int i) const { return options_[i]; }
 
-  bool isEndTag  () const { return   end_tag_; }
-  bool isStartTag() const { return ! end_tag_; }
+  bool isEndTag  () const { return   endTag_; }
+  bool isStartTag() const { return ! endTag_; }
 
-  const CHtmlTagDef &getTagDef() const { return tag_def_; }
+  const CHtmlTagDef &getTagDef() const { return tagDef_; }
 
  private:
   std::string        name_;
   OptionArray        options_;
-  bool               end_tag_ { false };
-  const CHtmlTagDef &tag_def_;
+  bool               endTag_ { false };
+  const CHtmlTagDef &tagDef_;
 };
 
 #endif

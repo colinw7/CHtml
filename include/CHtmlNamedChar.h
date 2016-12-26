@@ -36,11 +36,11 @@ class CHtmlNamedCharMgr {
   bool        decodeString(const std::string &istr, std::string &ostr) const;
 
  private:
-  static CHtmlNamedChar named_chars_[];
-  static uint           num_named_chars_;
+  static CHtmlNamedChar namedChars_[];
+  static uint           numNamedChars_;
 
-  NameValueMap name_value_map_;
-  ValueNameMap value_name_map_;
+  NameValueMap nameValueMap_;
+  ValueNameMap valueNameMap_;
 };
 
 #endif

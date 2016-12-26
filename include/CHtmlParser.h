@@ -18,9 +18,9 @@ class CHtmlParserTokens {
 
   void add(CHtmlToken *token);
 
-  int size() { return tokens_.size(); }
+  int size() const { return tokens_.size(); }
 
-  const CHtmlToken *operator[](int i) { return tokens_[i]; }
+  const CHtmlToken *operator[](int i) const { return tokens_[i]; }
 
   void clear();
 
@@ -83,8 +83,8 @@ class CHtmlParser {
   TagStack           tagStack_;
   Buffer             buffer_;
   bool               debug_ { false };
-  uint               line_num_ { 1 };
-  uint               char_num_ { 0 };
+  uint               lineNum_ { 1 };
+  uint               charNum_ { 0 };
 };
 
 #endif

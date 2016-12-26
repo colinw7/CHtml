@@ -8,6 +8,7 @@
 #include <CRegExp.h>
 #include <CStrUtil.h>
 #include <CThrow.h>
+#include <CUtf8.h>
 #include <cstdio>
 
 CHtmlParser::
@@ -474,12 +475,10 @@ replaceNamedChars(const std::string &value)
       else {
         CHtmlNamedChar *named_char;
 
-        if      (! CHtmlNamedCharMgrInst->lookup(name, &named_char))
-          value1 += value.substr(j, i - j + 1);
-        else if (named_char->value > 255)
-          value1 += value.substr(j, i - j + 1);
+        if (CHtmlNamedCharMgrInst->lookup(name, &named_char))
+          CUtf8::append(value1, named_char->value);
         else
-          value1 += char(named_char->value);
+          value1 += value.substr(j, i - j + 1);
       }
 
       ++i;
@@ -658,12 +657,12 @@ readChar()
       int c = file_->getC();
 
       if (c == '\n') {
-        ++line_num_;
+        ++lineNum_;
 
-        char_num_ = 0;
+        charNum_ = 0;
       }
       else
-        ++char_num_;
+        ++charNum_;
 
       return c;
     }
@@ -674,12 +673,12 @@ readChar()
   int c = buffer_[buffer_.size() - 1];
 
   if (c == '\n') {
-    ++line_num_;
+    ++lineNum_;
 
-    char_num_ = 0;
+    charNum_ = 0;
   }
   else
-    ++char_num_;
+    ++charNum_;
 
   buffer_.pop_back();
 
@@ -692,12 +691,12 @@ unreadChars(const std::string &str)
 {
   for (int i = str.size() - 1; i >= 0; --i) {
     if (str[i] == '\n') {
-      --line_num_;
+      --lineNum_;
 
-      char_num_ = 256;
+      charNum_ = 256;
     }
     else
-      --char_num_;
+      --charNum_;
 
     buffer_.push_back(str[i]);
   }
@@ -708,9 +707,9 @@ CHtmlParser::
 unreadChar(int c)
 {
   if (c == '\n')
-    --line_num_;
+    --lineNum_;
   else
-    --char_num_;
+    --charNum_;
 
   buffer_.push_back(c);
 }
@@ -723,7 +722,7 @@ parseError(const char *fmt, ...)
 
   va_start(vargs, fmt);
 
-  std::cerr << line_num_ << ":" << char_num_ << "> ";
+  std::cerr << lineNum_ << ":" << charNum_ << "> ";
   std::cerr << CStrUtil::vstrprintf(fmt, &vargs) << std::endl;
 
   va_end(vargs);
@@ -733,7 +732,7 @@ void
 CHtmlParser::
 parseError(const std::string &str)
 {
-  std::cerr << line_num_ << ":" << char_num_ << "> " << str << std::endl;
+  std::cerr << lineNum_ << ":" << charNum_ << "> " << str << std::endl;
 }
 
 CHtmlTag *
