@@ -38,7 +38,13 @@ class CHtmlTag {
   bool isEndTag  () const { return   endTag_; }
   bool isStartTag() const { return ! endTag_; }
 
+  bool isInline() const;
+
+  bool isEmpty() const;
+
   const CHtmlTagDef &getTagDef() const { return tagDef_; }
+
+  const CHtmlTagId &getTagId() const;
 
  private:
   std::string        name_;
