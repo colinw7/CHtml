@@ -20,6 +20,8 @@ class CHtmlParserTokens {
 
   int size() const { return tokens_.size(); }
 
+  bool empty() const { return tokens_.empty(); }
+
   const CHtmlToken *operator[](int i) const { return tokens_[i]; }
 
   void clear();
@@ -32,7 +34,7 @@ class CHtmlParserTokens {
 
 class CHtmlParser {
  public:
-  CHtmlParser(const CHtml &html);
+  explicit CHtmlParser(const CHtml &html);
  ~CHtmlParser();
 
   bool read(const std::string &filename, CHtmlParserTokens &tokens);

@@ -12,9 +12,9 @@ struct CHtmlNamedChar {
    name(name), value(value), str(str) {
   }
 
-  const char *name  = nullptr;
-  uint        value = 0;
-  const char *str   = nullptr;
+  const char *name  { nullptr };
+  uint        value { 0 };
+  const char *str   { nullptr };
 };
 
 //------

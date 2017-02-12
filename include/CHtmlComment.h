@@ -6,7 +6,7 @@
 
 class CHtmlComment {
  public:
-  CHtmlComment(const std::string &str);
+  explicit CHtmlComment(const std::string &str);
 
   std::string getString() const { return str_; }
 

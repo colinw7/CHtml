@@ -117,6 +117,8 @@ readComment()
     return false;
   }
 
+  //---
+
   CHtmlComment *comment = new CHtmlComment(str);
 
   CHtmlCommentToken *token = new CHtmlCommentToken(comment);
@@ -125,6 +127,17 @@ readComment()
     std::cerr << "Comment: " << str << std::endl;
 
   tokens_->add(token);
+
+  //---
+
+  CHtmlTag *currentTag = this->currentTag();
+
+  if (currentTag) {
+    if (debug_)
+      std::cerr << "Add <comment> to " << currentTag->getTagName() << std::endl;
+
+    currentTag->addChild(token);
+  }
 
   return true;
 }
@@ -201,7 +214,7 @@ readTag()
 
   c = readChar();
 
-  while (c != EOF && ! isspace(c) && c != '>') {
+  while (c != EOF && ! isspace(c) && c != '/' && c != '>') {
     name += c;
 
     c = readChar();
@@ -249,17 +262,31 @@ readTag()
   CHtmlTagToken *token = new CHtmlTagToken(tag);
 
   if (debug_)
-    parseError(std::string("Tag: ") + (tag->isEndTag() ? "/" : "") + tag->getName() +
+    parseError(std::string("Tag: ") + tag->getTagName() +
                (! tag->getTagDef().isValid() ? " <unknown>" : ""));
 
   tokens_->add(token);
 
+  //---
+
+  CHtmlTag *currentTag = this->currentTag();
+
+  //------
+
+  // start tag only
   if      (! end_tag && ! start_end_tag) {
+    if (currentTag) {
+      if (debug_)
+        std::cerr << "Add Start " << tag->getTagName() << " to " <<
+          currentTag->getTagName() << std::endl;
+
+      currentTag->addChild(token);
+    }
+
     tagStack_.push_back(tag);
   }
+  // end tag
   else if (end_tag) {
-    CHtmlTag *currentTag = this->currentTag();
-
     if      (! currentTag) {
       if (debug_)
         parseError("No current tag for end tag " + tag->getName());
@@ -271,21 +298,54 @@ readTag()
     }
     else {
       tagStack_.pop_back();
+
+      //CHtmlTag *currentTag = this->currentTag();
+
+      if (currentTag) {
+        if (debug_)
+          std::cerr << "Add End " << tag->getTagName() << " to " <<
+            currentTag->getTagName() << std::endl;
+
+        currentTag->addChild(token);
+      }
+    }
+  }
+  // start end tag
+  else {
+    if (currentTag) {
+      if (debug_)
+        std::cerr << "Add Start of Start/End " << tag->getTagName() << " to " <<
+          currentTag->getTagName() << std::endl;
+
+      currentTag->addChild(token);
     }
   }
 
+  //---
+
+  // auto add end tag for start end tag
   if (! end_tag && start_end_tag) {
     std::vector<CHtmlTagOption *> options;
 
-    CHtmlTag *tag = new CHtmlTag(name, options, true);
+    CHtmlTag *tag1 = new CHtmlTag(name, options, true);
 
-    CHtmlTagToken *token = new CHtmlTagToken(tag);
+    CHtmlTagToken *token1 = new CHtmlTagToken(tag1);
 
     if (debug_)
-      parseError(std::string("Tag: ") + "/" + tag->getName() +
-                 (! tag->getTagDef().isValid() ? " <unknown>" : ""));
+      parseError(std::string("Tag: ") + "/" + tag1->getName() +
+                 (! tag1->getTagDef().isValid() ? " <unknown>" : ""));
 
-    tokens_->add(token);
+    tokens_->add(token1);
+
+    //---
+
+    if (tag) {
+      if (debug_)
+        std::cerr << "Add End of Start/End " << tag1->getTagName() <<
+            " to " << tag->getTagName() << std::endl;
+
+      tag->addChild(token1);
+    }
   }
 
   return true;
@@ -525,7 +585,7 @@ readText()
     str += c;
   }
 
-  //----
+  //---
 
   str = replaceNamedChars(str);
 
@@ -537,6 +597,15 @@ readText()
     std::cerr << "Text: " << str << std::endl;
 
   tokens_->add(token);
+
+  //---
+
+  if (currentTag) {
+    if (debug_)
+      std::cerr << "Add <text> to " << currentTag->getTagName() << std::endl;
+
+    currentTag->addChild(token);
+  }
 }
 
 void
@@ -592,6 +661,13 @@ readScriptText()
     std::cerr << "Text: " << str << std::endl;
 
   tokens_->add(token);
+
+  //---
+
+  CHtmlTag *currentTag = this->currentTag();
+
+  if (currentTag)
+    currentTag->addChild(token);
 }
 
 bool

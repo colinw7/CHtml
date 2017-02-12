@@ -1,7 +1,6 @@
-#include "std_c++.h"
-#include "CFile/CFile.h"
-#include "CFile/CDir.h"
-#include "CHtml/CHtmlUtil.h"
+#include <CFile.h>
+#include <CDir.h>
+#include <CHtmlUtil.h>
 
 int
 main(int argc, char **argv)

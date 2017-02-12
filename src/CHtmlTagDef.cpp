@@ -110,6 +110,7 @@ CHtmlTagDef tagDefs[] = {
   CHtmlTagDef(CHtmlTagId::U         , "u"         , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::UL        , "ul"        , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::VAR       , "var"       , CHtmlTextType::PLAIN  ),
+  CHtmlTagDef(CHtmlTagId::VIDEO     , "video"     , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::WBR       , "wbr"       , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::XMP       , "xmp"       , CHtmlTextType::LITERAL),
   CHtmlTagDef(CHtmlTagId::COMMENT   , "!--"       , CHtmlTextType::PLAIN  ),

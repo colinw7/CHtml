@@ -1,19 +1,22 @@
 #include <CHtmlLib.h>
 #include <CStrUtil.h>
 
-static bool processFile
-             (const char *file);
-static void output_string
-             (const std::string &str);
-static void output
-             (const std::string &str);
-static void newline
-             (int num=1);
+static bool        processFile
+                    (const char *file);
+static void        outputString
+                    (const std::string &str);
+static void        output
+                    (const std::string &str);
+static std::string headerString
+                    (int level=1);
+static void        newline
+                    (int num=1);
 
-static int         new_line  = 1;
-static bool        non_space = false;
-static bool        format    = true;
-static std::string buffer    = "";
+static int         new_line   = 1;
+static bool        non_space  = false;
+static bool        format     = true;
+static std::string buffer     = "";
+static int         blockquote = 0;
 
 int
 main(int argc, char **argv)
@@ -65,16 +68,9 @@ processFile(const char *file)
 
       std::string str = text->getText();
 
-      str = CStrUtil::translate(str, "\r", "\n");
-      str = CStrUtil::translate(str, "\x85", "...");
-      str = CStrUtil::translate(str, "\x91\x92", "''");
-      str = CStrUtil::translate(str, "\x93\x94", "\"\"");
-      str = CStrUtil::translate(str, "\x96", "-");
-      str = CStrUtil::translate(str, "\xa0", " ");
-
       std::string ostr;
 
-      if (format) {
+      if (format && blockquote == 0) {
         std::vector<std::string> lines;
 
         CStrUtil::addLines(str, lines);
@@ -86,15 +82,32 @@ processFile(const char *file)
 
           ostr = CStrUtil::stripSpaces(ostr);
 
-          output_string(ostr);
+          outputString(ostr);
         }
       }
       else {
-        CHtmlNamedCharMgrInst->decodeString(str, ostr);
+        //ostr = CStrUtil::translate(ostr, "\n", " ");
 
-        ostr = CStrUtil::translate(ostr, "\n", " ");
+        std::vector<std::string> lines;
 
-        output_string(ostr);
+        CStrUtil::addLines(str, lines);
+
+        uint num_lines = lines.size();
+
+        for (uint j = 0; j < num_lines; ++j) {
+          CHtmlNamedCharMgrInst->decodeString(lines[j], ostr);
+
+          if (blockquote > 0) {
+            for (int k = 0; k < blockquote; ++k)
+              output(">");
+
+            output(" ");
+          }
+
+          outputString(ostr);
+
+          newline();
+        }
       }
     }
     else if (token->isTag()) {
@@ -113,73 +126,85 @@ processFile(const char *file)
           in_body = false;
       }
       else if (id == CHtmlTagId::H1) {
+        std::string str = headerString(1);
+
         if (tag->isStartTag()) {
           newline(2);
 
-          output("====== ");
+          output(str + " ");
         }
         else {
-          output(" ======");
+          output(" " + str);
 
           newline(2);
         }
       }
       else if (id == CHtmlTagId::H2) {
+        std::string str = headerString(2);
+
         if (tag->isStartTag()) {
           newline(2);
 
-          output("===== ");
+          output(str + " ");
         }
         else {
-          output(" =====");
+          output(" " + str);
 
           newline(2);
         }
       }
       else if (id == CHtmlTagId::H3) {
+        std::string str = headerString(3);
+
         if (tag->isStartTag()) {
           newline(2);
 
-          output("==== ");
+          output(str + " ");
         }
         else {
-          output(" ====");
+          output(" " + str);
 
           newline(2);
         }
       }
       else if (id == CHtmlTagId::H4) {
+        std::string str = headerString(4);
+
         if (tag->isStartTag()) {
           newline(2);
 
-          output("=== ");
+          output(str + " ");
         }
         else {
-          output(" ===");
+          output(" " + str);
 
           newline(2);
         }
       }
       else if (id == CHtmlTagId::H5) {
+        std::string str = headerString(5);
+
         if (tag->isStartTag()) {
           newline(2);
 
-          output("== ");
+          output(str + " ");
         }
         else {
-          output(" ==");
+          output(" " + str);
 
           newline(2);
         }
       }
       else if (id == CHtmlTagId::H6) {
+        std::string str = headerString(6);
+
         if (tag->isStartTag()) {
           newline(2);
 
-          output("== ");
+          output(str + " ");
         }
         else {
-          output(" ==");
+          output(" " + str);
 
           newline(2);
         }
@@ -231,14 +256,15 @@ processFile(const char *file)
 
           ++in_table_row;
         }
-        else
+        else {
           --in_table_row;
+
+          newline();
+        }
 
         table_split = false;
       }
-      else if (id == CHtmlTagId::LI ||
-               id == CHtmlTagId::DT ||
-               id == CHtmlTagId::DD) {
+      else if (id == CHtmlTagId::LI || id == CHtmlTagId::DT || id == CHtmlTagId::DD) {
         if (tag->isStartTag()) {
           if (! in_table_row)
             newline();
@@ -252,7 +278,7 @@ processFile(const char *file)
             output("  ");
 
           if (! list_type_list.empty() && list_type_list.back() == ORDERED)
-            output("- ");
+            output("1. ");
           else
             output("* ");
         }
@@ -260,12 +286,12 @@ processFile(const char *file)
       else if (id == CHtmlTagId::TH) {
         if (tag->isStartTag()) {
           if (! table_split)
-            output("^ ");
+            output("| ");
           else
             output(" ");
         }
         else {
-          output(" ^");
+          output(" |");
 
           table_split = true;
         }
@@ -285,6 +311,9 @@ processFile(const char *file)
       }
       else if (id == CHtmlTagId::A) {
         if (tag->isStartTag()) {
+          output("[");
+        }
+        else {
           const CHtmlTag::OptionArray &options = tag->getOptions();
 
           CHtmlTag::OptionArray::const_iterator p1 = options.begin();
@@ -303,12 +332,20 @@ processFile(const char *file)
           }
 
           if (link_href != "")
-            output("[[" + link_href + "|");
+            output("](" + link_href + ")");
           else
-            output("[[" + link_name + "|");
+            output("](" + link_name + ")");
         }
-        else
-          output("]]");
+      }
+      else if (id == CHtmlTagId::BLOCKQUOTE) {
+        if (tag->isStartTag()) {
+          ++blockquote;
+        }
+        else {
+          --blockquote;
+        }
+
+        //format = (blockquote > 0);
       }
       else if (id == CHtmlTagId::SCRIPT) {
         if (tag->isStartTag())
@@ -325,7 +362,7 @@ processFile(const char *file)
         CHtmlTag::OptionArray::const_iterator p1 = options.begin();
         CHtmlTag::OptionArray::const_iterator p2 = options.end  ();
 
-        std::string src, al, ar;
+        std::string src, desc, al, ar;
 
         for ( ; p1 != p2; ++p1) {
           const std::string &name = (*p1)->getName();
@@ -341,9 +378,11 @@ processFile(const char *file)
               al = " "; ar = " ";
             }
           }
+          else if (name == "alt")
+            desc = (*p1)->getValue();
         }
 
-        output("{{" + al + src + ar + "}}");
+        output("![" + desc + "](" + src + ")");
       }
       else if (id == CHtmlTagId::P) {
         if (! in_table) {
@@ -381,23 +420,29 @@ processFile(const char *file)
         else
           output("**");
       }
+      else if (id == CHtmlTagId::EM) {
+        if (tag->isStartTag())
+          output("**");
+        else
+          output("**");
+      }
       else if (id == CHtmlTagId::I) {
         if (tag->isStartTag())
-          output("//");
+          output("_");
         else
-          output("//");
+          output("_");
       }
       else if (id == CHtmlTagId::U) {
         if (tag->isStartTag())
-          output("__");
+          output(""); // TODO
         else
-          output("__");
+          output(""); // TODO
       }
       else if (id == CHtmlTagId::HR) {
         if (tag->isStartTag()) {
           newline(2);
 
-          output("____");
+          outputString("****");
 
           newline(2);
         }
@@ -411,7 +456,7 @@ processFile(const char *file)
 }
 
 static void
-output_string(const std::string &str)
+outputString(const std::string &str)
 {
   if (str != "") {
     if (new_line && ! format)
@@ -437,6 +482,17 @@ static void
 output(const std::string &str)
 {
   buffer += str;
+}
+
+static std::string
+headerString(int level)
+{
+  std::string str;
+
+  for (int i = 0; i < level && i < 6; ++i)
+    str += "#";
+
+  return str;
 }
 
 static void

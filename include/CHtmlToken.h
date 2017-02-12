@@ -24,9 +24,9 @@ class CHtmlToken {
   bool isTag    () const { return type_ == CHtmlTokenType::TAG    ; }
   bool isText   () const { return type_ == CHtmlTokenType::TEXT   ; }
 
-  virtual CHtmlComment *getComment() const { return 0; }
-  virtual CHtmlTag     *getTag    () const { return 0; }
-  virtual CHtmlText    *getText   () const { return 0; }
+  virtual CHtmlComment *getComment() const { return nullptr; }
+  virtual CHtmlTag     *getTag    () const { return nullptr; }
+  virtual CHtmlText    *getText   () const { return nullptr; }
 
  protected:
   CHtmlTokenType type_ { CHtmlTokenType::NONE };
