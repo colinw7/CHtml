@@ -28,7 +28,13 @@ class CHtmlTag {
  public:
   CHtmlTag(const std::string &name, const OptionArray &options, bool end_tag);
 
+  CHtmlTag *parent() { return parent_; }
+  void setParent(CHtmlTag *parent) { parent_ = parent; }
+
   const std::string &getName() const { return name_; }
+  void setName(const std::string &n) { name_ = n; }
+
+  //---
 
   uint getNumOptions() const { return options_.size(); }
 
@@ -46,25 +52,38 @@ class CHtmlTag {
 
   std::string getOptionValue(const std::string &name) const;
 
+  //---
+
   bool isEndTag  () const { return   endTag_; }
   bool isStartTag() const { return ! endTag_; }
 
+  //---
+
   bool isInline() const;
 
-  std::string getTagName() const;
-
   bool isEmpty() const;
+
+  //---
+
+  std::string getTagName() const;
 
   const CHtmlTagDef &getTagDef() const { return tagDef_; }
 
   const CHtmlTagId &getTagId() const;
 
+  //---
+
   const Children &children() const { return children_; }
 
-  CHtmlTag *parent() { return parent_; }
-  void setParent(CHtmlTag *parent) { parent_ = parent; }
-
   void addChild(CHtmlToken *child);
+
+  //---
+
+  int lineNum() const { return lineNum_; }
+  void setLineNum(int i) { lineNum_ = i; }
+
+  int charNum() const { return charNum_; }
+  void setCharNum(int i) { charNum_ = i; }
 
  private:
   CHtmlTag*          parent_ { nullptr };
@@ -73,6 +92,8 @@ class CHtmlTag {
   bool               endTag_ { false };
   const CHtmlTagDef& tagDef_;
   Children           children_;
+  int                lineNum_ { 0 };
+  int                charNum_ { 0 };
 };
 
 #endif

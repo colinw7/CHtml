@@ -7,6 +7,20 @@
 #include <set>
 #include <sys/types.h>
 
+enum class CHtmlTagDisplay {
+  INVALID,
+  NONE,
+  BLOCK,
+  INLINE,
+  TABLE,
+  TABLE_ROW,
+  TABLE_CELL,
+  TABLE_CAPTION,
+  LIST_ITEM
+};
+
+//---
+
 #define CHtmlTagDefLookupInst CHtmlTagDefLookup::instance()
 
 class CHtmlTagDef;
@@ -27,18 +41,20 @@ class CHtmlTagDefLookup {
   typedef std::map<std::string, const CHtmlTagDef *> NameToTag;
   typedef std::map<CHtmlTagId , const CHtmlTagDef *> IdToTag;
   typedef std::set<CHtmlTagId>                       TagSet;
+  typedef std::map<CHtmlTagId , CHtmlTagDisplay>     IdToDisplay;
 
-  NameToTag nameToTag_;
-  IdToTag   idToTag_;
-  TagSet    inlineTags_;
-  TagSet    emptyTags_;
-  TagSet    metaTags_;
-  TagSet    flowTags_;
-  TagSet    sectionTags_;
-  TagSet    headingTags_;
-  TagSet    phrasingTags_;
-  TagSet    embedTags_;
-  TagSet    interactiveTags_;
+  NameToTag   nameToTag_;
+  IdToTag     idToTag_;
+  IdToDisplay idToDisplay_;
+  TagSet      inlineTags_;
+  TagSet      emptyTags_;
+  TagSet      metaTags_;
+  TagSet      flowTags_;
+  TagSet      sectionTags_;
+  TagSet      headingTags_;
+  TagSet      phrasingTags_;
+  TagSet      embedTags_;
+  TagSet      interactiveTags_;
 };
 
 //---
