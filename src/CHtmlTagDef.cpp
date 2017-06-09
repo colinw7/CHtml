@@ -96,6 +96,7 @@ CHtmlTagDef tagDefs[] = {
   CHtmlTagDef(CHtmlTagId::SUB       , "sub"       , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::SUMMARY   , "summary"   , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::SUP       , "sup"       , CHtmlTextType::PLAIN  ),
+  CHtmlTagDef(CHtmlTagId::SVG       , "svg"       , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::TABLE     , "table"     , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::TBODY     , "tbody"     , CHtmlTextType::PLAIN  ),
   CHtmlTagDef(CHtmlTagId::TD        , "td"        , CHtmlTextType::PLAIN  ),
@@ -212,6 +213,14 @@ CHtmlTagDefLookup()
                         CHtmlTagId::IFRAME, CHtmlTagId::KEYGEN, CHtmlTagId::LABEL,
                         CHtmlTagId::SELECT, CHtmlTagId::TEXTAREA }};
 
+  TagSet blockTags = {{ CHtmlTagId::ADDRESS, CHtmlTagId::BLOCKQUOTE, CHtmlTagId::BODY,
+                        CHtmlTagId::DIV, CHtmlTagId::H1, CHtmlTagId::H2, CHtmlTagId::H3,
+                        CHtmlTagId::H4, CHtmlTagId::H5, CHtmlTagId::H6,
+                        CHtmlTagId::HTML, CHtmlTagId::DIR, CHtmlTagId::DL,
+                        CHtmlTagId::MENU, CHtmlTagId::OL, CHtmlTagId::UL,
+                        CHtmlTagId::DD, CHtmlTagId::DT, CHtmlTagId::P,
+                        CHtmlTagId::PRE, CHtmlTagId::HR, CHtmlTagId::XMP }};
+
   //---
 
   for (uint i = 1; i < numTagDefs; i++) {
@@ -246,6 +255,10 @@ CHtmlTagDefLookup()
 
     if (interactiveTags_.find(tagDef.getId()) != interactiveTags_.end())
       tagDef.setInteractive(true);
+
+    if (blockTags.find(tagDef.getId()) != blockTags.end())
+      idToDisplay_[tagDef.getId()] = CHtmlTagDisplay::BLOCK;
+
   }
 }
 

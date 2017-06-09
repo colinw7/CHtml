@@ -9,25 +9,35 @@ CFLAGS = \
 -std=c++11 \
 $(CDEBUG) \
 -I. \
--I$(INC_DIR) \
--I$(INC_DIR)/CHtml \
--I$(INC_DIR)/CCSS \
--I$(INC_DIR)/CXml \
--I$(INC_DIR)/CFile \
--I$(INC_DIR)/CFileType \
--I$(INC_DIR)/CStrUtil \
--I$(INC_DIR)/CAutoPtr \
+-I../include \
+-I../../CHtml/include \
+-I../../CCSS/include \
+-I../../CXml/include \
+-I../../CFile/include \
+-I../../CFileType/include \
+-I../../CStrUtil/include \
+-I../../CUtil/include \
 
 LDEBUG = -g
 
 LFLAGS = \
 $(LDEBUG) \
--L$(LIB_DIR) \
--lCHtml -lCCSS -lCXML -lCStrParse \
--lCFile -lCImageLib -lCGlob -lCUtil -lCStrUtil \
--lCRegExp -lCGlob -lCOSUser -lCOSFile -lCOSTime -lCOSProcess -lCOSSignal \
--lCEnv -lCImageUtil -lCStrNCase -lCPrintF \
--ltre -lpng -ljpeg -lm -lc
+-L../lib \
+-L../../CHtml/lib \
+-L../../CCSS/lib \
+-L../../CXML/lib \
+-L../../CFile/lib \
+-L../../CStrUtil/lib \
+-L../../CRegExp/lib \
+-L../../COS/lib \
+-lCHtml \
+-lCCSS \
+-lCXML \
+-lCFile \
+-lCStrUtil \
+-lCRegExp \
+-lCOS \
+-ltre
 
 SRCS1 = CHtmlTest.cpp
 OBJS1 = $(SRCS1:.cpp=.o)

@@ -259,6 +259,11 @@ readTag()
 
   CHtmlTag *tag = new CHtmlTag(name, options, end_tag);
 
+  tag->setLineNum(lineNum_);
+  tag->setCharNum(charNum_);
+
+  //---
+
   CHtmlTagToken *token = new CHtmlTagToken(tag);
 
   if (debug_)
