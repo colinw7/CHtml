@@ -26,6 +26,9 @@ class CHtmlParserTokens {
 
   void clear();
 
+  CHtmlTokenArray::iterator begin() { return tokens_.begin(); }
+  CHtmlTokenArray::iterator end  () { return tokens_.end  (); }
+
  private:
   CHtmlTokenArray tokens_;
 };
