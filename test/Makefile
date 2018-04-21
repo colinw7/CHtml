@@ -6,7 +6,7 @@ LD = g++
 CDEBUG = -g
 
 CFLAGS = \
--std=c++11 \
+-std=c++14 \
 $(CDEBUG) \
 -I. \
 -I../include \
