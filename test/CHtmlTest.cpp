@@ -2,8 +2,8 @@
 #include <CStrUtil.h>
 
 static bool processFile(const std::string &filename, const std::string &match,
-                        bool hier, bool debug);
-static void printToken(const CHtmlToken *token, const std::string &match, bool &inside);
+                        bool text, bool hier, bool debug);
+static void printToken(const CHtmlToken *token, const std::string &match, bool text, bool &inside);
 static void printHierToken(const CHtmlToken *token, int depth=0, bool newline=true);
 static void printStartTag(CHtmlTag *tag, int depth=0);
 static void printEndTag(CHtmlTag *tag, int depth=0);
@@ -15,6 +15,7 @@ main(int argc, char **argv)
 {
   std::string match;
   std::string filename;
+  bool        text = false;
   bool        hier = false;
   bool        debug = false;
 
@@ -29,6 +30,9 @@ main(int argc, char **argv)
 
         if (i < argc)
           match = argv[i];
+      }
+      else if (opt == "text") {
+        text = true;
       }
       else if (opt == "hier") {
         hier = true;
@@ -47,13 +51,13 @@ main(int argc, char **argv)
   }
 
   if (filename != "")
-    processFile(filename, match, hier, debug);
+    processFile(filename, match, text, hier, debug);
 
   return 0;
 }
 
 bool
-processFile(const std::string &filename, const std::string &match, bool hier, bool debug)
+processFile(const std::string &filename, const std::string &match, bool text, bool hier, bool debug)
 {
   CHtml             html;
   CHtmlParserTokens tokens;
@@ -78,7 +82,7 @@ processFile(const std::string &filename, const std::string &match, bool hier, bo
     for (int i = 0; i < tokens.size(); ++i) {
       const CHtmlToken *token = tokens[i];
 
-      printToken(token, match, inside);
+      printToken(token, match, text, inside);
     }
   }
 
@@ -86,7 +90,7 @@ processFile(const std::string &filename, const std::string &match, bool hier, bo
 }
 
 void
-printToken(const CHtmlToken *token, const std::string &match, bool &inside)
+printToken(const CHtmlToken *token, const std::string &match, bool text, bool &inside)
 {
   if      (token->isText()) {
     if (inside) {
@@ -108,7 +112,7 @@ printToken(const CHtmlToken *token, const std::string &match, bool &inside)
     std::string tagName = tag_def.getName();
 
     if (tag->isStartTag()) {
-      if (inside)
+      if (inside && ! text)
         printStartTag(tag, 0);
 
       if (match != "" && tagName == match)
@@ -118,7 +122,7 @@ printToken(const CHtmlToken *token, const std::string &match, bool &inside)
       if (match != "" && tagName == match)
         inside = false;
 
-      if (inside)
+      if (inside && ! text)
         printEndTag(tag, 0);
     }
   }
