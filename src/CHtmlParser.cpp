@@ -33,7 +33,7 @@ read(const std::string &filename, CHtmlParserTokens &tokens)
 
   tokens_ = &tokens;
 
-  file_ = new CFile(filename);
+  file_ = std::make_unique<CFile>(filename);
 
   while (lookChar() != EOF) {
     if      (isComment())
@@ -330,9 +330,9 @@ readTag()
 
   // auto add end tag for start end tag
   if (! end_tag && start_end_tag) {
-    std::vector<CHtmlTagOption *> options;
+    std::vector<CHtmlTagOption *> options1;
 
-    CHtmlTag *tag1 = new CHtmlTag(name, options, true);
+    CHtmlTag *tag1 = new CHtmlTag(name, options1, true);
 
     CHtmlTagToken *token1 = new CHtmlTagToken(tag1);
 

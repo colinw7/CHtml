@@ -2,11 +2,11 @@
 #include <CStrUtil.h>
 
 static bool processFile(const std::string &filename, const std::string &match,
-                        bool text, bool hier, bool debug);
+                        bool hier, bool text, bool debug);
 static void printToken(const CHtmlToken *token, const std::string &match, bool text, bool &inside);
-static void printHierToken(const CHtmlToken *token, int depth=0, bool newline=true);
-static void printStartTag(CHtmlTag *tag, int depth=0);
-static void printEndTag(CHtmlTag *tag, int depth=0);
+static void printHierToken(const CHtmlToken *token, bool text, int depth=0, bool newline=true);
+static void printStartTag(CHtmlTag *tag, bool text, int depth=0);
+static void printEndTag(CHtmlTag *tag, bool text, int depth=0);
 static void printDepthSpaces(int depth=0);
 static bool hasChildTags(CHtmlTag *tag);
 
@@ -15,8 +15,8 @@ main(int argc, char **argv)
 {
   std::string match;
   std::string filename;
-  bool        text = false;
   bool        hier = false;
+  bool        text = false;
   bool        debug = false;
 
   for (int i = 1; i < argc; i++) {
@@ -31,17 +31,17 @@ main(int argc, char **argv)
         if (i < argc)
           match = argv[i];
       }
-      else if (opt == "text") {
-        text = true;
-      }
       else if (opt == "hier") {
         hier = true;
+      }
+      else if (opt == "text") {
+        text = true;
       }
       else if (opt == "debug") {
         debug = true;
       }
       else {
-        std::cerr << "Invalid option '" << arg << "'" << std::endl;
+        std::cerr << "Invalid option '" << arg << "'\n";
         exit(1);
       }
     }
@@ -51,13 +51,14 @@ main(int argc, char **argv)
   }
 
   if (filename != "")
-    processFile(filename, match, text, hier, debug);
+    processFile(filename, match, hier, text, debug);
 
   return 0;
 }
 
 bool
-processFile(const std::string &filename, const std::string &match, bool text, bool hier, bool debug)
+processFile(const std::string &filename, const std::string &match,
+            bool hier, bool text, bool debug)
 {
   CHtml             html;
   CHtmlParserTokens tokens;
@@ -76,7 +77,7 @@ processFile(const std::string &filename, const std::string &match, bool text, bo
 
     const CHtmlToken *token = tokens[0];
 
-    printHierToken(token, depth);
+    printHierToken(token, text, depth);
   }
   else {
     for (int i = 0; i < tokens.size(); ++i) {
@@ -94,14 +95,14 @@ printToken(const CHtmlToken *token, const std::string &match, bool text, bool &i
 {
   if      (token->isText()) {
     if (inside) {
-      CHtmlText *text = token->getText();
+      CHtmlText *ttext = token->getText();
 
-      std::string str = text->getText();
+      std::string str = ttext->getText();
 
       std::string sstr = CStrUtil::stripSpaces(str);
 
       if (sstr != "")
-        std::cout << sstr << std::endl;
+        std::cout << sstr << "\n";
     }
   }
   else if (token->isTag()) {
@@ -112,8 +113,8 @@ printToken(const CHtmlToken *token, const std::string &match, bool text, bool &i
     std::string tagName = tag_def.getName();
 
     if (tag->isStartTag()) {
-      if (inside && ! text)
-        printStartTag(tag, 0);
+      if (inside)
+        printStartTag(tag, text, 0);
 
       if (match != "" && tagName == match)
         inside = true;
@@ -122,75 +123,83 @@ printToken(const CHtmlToken *token, const std::string &match, bool text, bool &i
       if (match != "" && tagName == match)
         inside = false;
 
-      if (inside && ! text)
-        printEndTag(tag, 0);
+      if (inside)
+        printEndTag(tag, text, 0);
     }
   }
 }
 
 void
-printHierToken(const CHtmlToken *token, int depth, bool newline)
+printHierToken(const CHtmlToken *token, bool text, int depth, bool newline)
 {
   if      (token->isText()) {
-    CHtmlText *text = token->getText();
+    CHtmlText *ttext = token->getText();
 
-    std::string str = text->getText();
+    std::string str = ttext->getText();
 
     std::string sstr = CStrUtil::stripSpaces(str);
 
-    if (sstr != "")
+    if (sstr != "") {
       std::cout << sstr;
+
+      if (text)
+        std::cout << "\n";
+    }
   }
   else if (token->isTag()) {
     CHtmlTag *tag = token->getTag();
 
     if (tag->isStartTag())
-      printStartTag(tag, depth);
+      printStartTag(tag, text, depth);
     else {
-      if (newline) {
-        std::cout << std::endl;
+      if (! text) {
+        if (newline) {
+          std::cout << "\n";
 
-        printDepthSpaces(depth - 1);
+          printDepthSpaces(depth - 1);
+        }
       }
 
-      printEndTag(tag, depth - 1);
+      printEndTag(tag, text, depth - 1);
     }
   }
 }
 
 void
-printStartTag(CHtmlTag *tag, int depth)
+printStartTag(CHtmlTag *tag, bool text, int depth)
 {
   bool isInline = tag->isInline();
 
   //---
 
-  const CHtmlTagDef &tag_def = tag->getTagDef();
+  if (! text) {
+    const CHtmlTagDef &tag_def = tag->getTagDef();
 
-  std::string tagName = tag_def.getName();
+    std::string tagName = tag_def.getName();
 
-  if (! isInline) {
-    std::cout << std::endl;
+    if (! isInline) {
+      std::cout << "\n";
 
-    printDepthSpaces(depth);
+      printDepthSpaces(depth);
+    }
+
+    std::cout << "<" << tagName;
+
+    //---
+
+    int num_options = tag->getNumOptions();
+
+    for (int j = 0; j < num_options; j++) {
+      const CHtmlTagOption *option = tag->getOption(j);
+
+      std::string name  = option->getName ();
+      std::string value = option->getValue();
+
+      std::cout << " " << name << "=\"" << value << "\"";
+    }
+
+    std::cout << ">";
   }
-
-  std::cout << "<" << tagName;
-
-  //---
-
-  int num_options = tag->getNumOptions();
-
-  for (int j = 0; j < num_options; j++) {
-    const CHtmlTagOption *option = tag->getOption(j);
-
-    std::string name  = option->getName ();
-    std::string value = option->getValue();
-
-    std::cout << " " << name << "=\"" << value << "\"";
-  }
-
-  std::cout << ">";
 
   //---
 
@@ -199,18 +208,20 @@ printStartTag(CHtmlTag *tag, int depth)
   const CHtmlTag::Children &children = tag->children();
 
   for (const auto &child : children) {
-    printHierToken(child, depth + 1, childTags);
+    printHierToken(child, text, depth + 1, childTags);
   }
 }
 
 void
-printEndTag(CHtmlTag *tag, int depth)
+printEndTag(CHtmlTag *tag, bool text, int depth)
 {
-  const CHtmlTagDef &tag_def = tag->getTagDef();
+  if (! text) {
+    const CHtmlTagDef &tag_def = tag->getTagDef();
 
-  std::string tagName = tag_def.getName();
+    std::string tagName = tag_def.getName();
 
-  std::cout << "</" << tagName << ">";
+    std::cout << "</" << tagName << ">";
+  }
 }
 
 void

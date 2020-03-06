@@ -145,12 +145,12 @@ enum class CHtmlTextType {
   RAW,
 };
 
-class CHtmlParserTokens;
-class CHtmlParser;
-class CHtmlNamedChar;
-class CHtmlTagDef;
-class CHtmlTagOption;
-class CHtmlToken;
+class  CHtmlParserTokens;
+class  CHtmlParser;
+struct CHtmlNamedChar;
+class  CHtmlTagDef;
+class  CHtmlTagOption;
+class  CHtmlToken;
 
 typedef std::vector<CHtmlToken *>     CHtmlTokenArray;
 typedef std::vector<CHtmlTagOption *> CHtmlTagOptionArray;

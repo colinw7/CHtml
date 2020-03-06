@@ -2,10 +2,11 @@
 #define CHtmlParser_H
 
 #include <CHtmlTypes.h>
-#include <CAutoPtr.h>
 #include <CFile.h>
+
 #include <string>
 #include <vector>
+#include <memory>
 
 class CHtml;
 class CHtmlTag;
@@ -81,10 +82,11 @@ class CHtmlParser {
  private:
   typedef std::vector<char>       Buffer;
   typedef std::vector<CHtmlTag *> TagStack;
+  typedef std::unique_ptr<CFile>  FileP;
 
-  const CHtml       &html_;
-  CAutoPtr<CFile>    file_;
-  CHtmlParserTokens *tokens_ { nullptr };
+  const CHtml&       html_;
+  FileP              file_;
+  CHtmlParserTokens* tokens_ { nullptr };
   TagStack           tagStack_;
   Buffer             buffer_;
   bool               debug_ { false };
