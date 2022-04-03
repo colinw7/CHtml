@@ -106,7 +106,7 @@ readComment()
       break;
     }
 
-    str += readChar();
+    str += char(readChar());
 
     c = lookChar();
   }
@@ -119,9 +119,9 @@ readComment()
 
   //---
 
-  CHtmlComment *comment = new CHtmlComment(str);
+  auto *comment = new CHtmlComment(str);
 
-  CHtmlCommentToken *token = new CHtmlCommentToken(comment);
+  auto *token = new CHtmlCommentToken(comment);
 
   if (debug_)
     std::cerr << "Comment: " << str << std::endl;
@@ -153,12 +153,12 @@ isTag()
 
   std::string str;
 
-  str += readChar();
+  str += char(readChar());
 
   c = lookChar();
 
   if (c == '/')
-    str += readChar();
+    str += char(readChar());
 
   c = lookChar();
 
@@ -210,12 +210,12 @@ readTag()
 
   std::string name;
 
-  name += c;
+  name += char(c);
 
   c = readChar();
 
   while (c != EOF && ! isspace(c) && c != '/' && c != '>') {
-    name += c;
+    name += char(c);
 
     c = readChar();
   }
@@ -257,14 +257,14 @@ readTag()
 
   //------
 
-  CHtmlTag *tag = new CHtmlTag(name, options, end_tag);
+  auto *tag = new CHtmlTag(name, options, end_tag);
 
-  tag->setLineNum(lineNum_);
-  tag->setCharNum(charNum_);
+  tag->setLineNum(int(lineNum_));
+  tag->setCharNum(int(charNum_));
 
   //---
 
-  CHtmlTagToken *token = new CHtmlTagToken(tag);
+  auto *token = new CHtmlTagToken(tag);
 
   if (debug_)
     parseError(std::string("Tag: ") + tag->getTagName() +
@@ -332,9 +332,9 @@ readTag()
   if (! end_tag && start_end_tag) {
     std::vector<CHtmlTagOption *> options1;
 
-    CHtmlTag *tag1 = new CHtmlTag(name, options1, true);
+    auto *tag1 = new CHtmlTag(name, options1, true);
 
-    CHtmlTagToken *token1 = new CHtmlTagToken(tag1);
+    auto *token1 = new CHtmlTagToken(tag1);
 
     if (debug_)
       parseError(std::string("Tag: ") + "/" + tag1->getName() +
@@ -389,7 +389,7 @@ readTagOptions(std::vector<CHtmlTagOption *> &options)
     c = readChar();
 
     while (c != EOF && ! isspace(c) && c != '=' && c != '>') {
-      name += c;
+      name += char(c);
 
       c = readChar();
     }
@@ -425,7 +425,7 @@ readTagOptions(std::vector<CHtmlTagOption *> &options)
             if (c == '\'')
               break;
 
-            value += c;
+            value += char(c);
 
             c = readChar();
           }
@@ -440,7 +440,7 @@ readTagOptions(std::vector<CHtmlTagOption *> &options)
             if (c == '\"')
               break;
 
-            value += c;
+            value += char(c);
 
             c = readChar();
           }
@@ -457,10 +457,10 @@ readTagOptions(std::vector<CHtmlTagOption *> &options)
           if (c1 == '>')
             break;
 
-          value += c;
+          value += char(c);
         }
         else {
-          value += c;
+          value += char(c);
 
           c = readChar();
         }
@@ -476,7 +476,7 @@ readTagOptions(std::vector<CHtmlTagOption *> &options)
 
     //------
 
-    CHtmlTagOption *option = new CHtmlTagOption(name, value);
+    auto *option = new CHtmlTagOption(name, value);
 
     if (debug_)
       std::cerr << "Option: " << name << "," << value << std::endl;
@@ -494,14 +494,15 @@ replaceNamedChars(const std::string &value)
 
   std::string value1;
 
-  uint i   = 0;
-  uint len = value.size();
+  auto len = value.size();
+
+  decltype(len) i = 0;
 
   while (i < len) {
     char c = value[i];
 
     if (c == '&') {
-      uint j = i++;
+      auto j = i++;
 
       while (i < len) {
         if (value[i] == ';')
@@ -515,7 +516,7 @@ replaceNamedChars(const std::string &value)
         break;
       }
 
-      uint len1 = i - j - 1;
+      auto len1 = i - j - 1;
 
       std::string name = value.substr(j + 1, len1);
 
@@ -549,7 +550,7 @@ replaceNamedChars(const std::string &value)
       ++i;
     }
     else {
-      value1 += c;
+      value1 += char(c);
 
       ++i;
     }
@@ -579,7 +580,7 @@ readText()
 
   std::string str;
 
-  str += c;
+  str += char(c);
 
   while (! isComment() && ! isTag()) {
     c = readChar();
@@ -587,16 +588,16 @@ readText()
     if (c == EOF)
       break;
 
-    str += c;
+    str += char(c);
   }
 
   //---
 
   str = replaceNamedChars(str);
 
-  CHtmlText *text = new CHtmlText(str);
+  auto *text = new CHtmlText(str);
 
-  CHtmlTextToken *token = new CHtmlTextToken(text);
+  auto *token = new CHtmlTextToken(text);
 
   if (debug_)
     std::cerr << "Text: " << str << std::endl;
@@ -629,20 +630,20 @@ readScriptText()
       tagName = "";
       inTag   = true;
 
-      tagName += c;
+      tagName += char(c);
     }
     else if (c == '>') {
       if (inTag)
-        tagName += c;
+        tagName += char(c);
 
       inTag = false;
     }
     else {
       if (inTag)
-        tagName += tolower(c);
+        tagName += char(tolower(c));
     }
 
-    str += c;
+    str += char(c);
 
     if (tagName == "</script>") {
       endFound = true;
@@ -658,9 +659,9 @@ readScriptText()
     unreadChars("</script>");
   }
 
-  CHtmlText *text = new CHtmlText(str);
+  auto *text = new CHtmlText(str);
 
-  CHtmlTextToken *token = new CHtmlTextToken(text);
+  auto *token = new CHtmlTextToken(text);
 
   if (debug_)
     std::cerr << "Text: " << str << std::endl;
@@ -681,9 +682,9 @@ matchString(const std::string &str)
 {
   std::string str1;
 
-  int len = str.size();
+  auto len = str.size();
 
-  for (int i = 0; i < len; ++i) {
+  for (decltype(len) i = 0; i < len; ++i) {
     int c = lookChar();
 
     if (c != str[i]) {
@@ -691,7 +692,7 @@ matchString(const std::string &str)
       return false;
     }
 
-    str1 += readChar();
+    str1 += char(readChar());
   }
 
   return true;
@@ -723,7 +724,7 @@ lookChar()
     if (c == EOF)
       return EOF;
 
-    buffer_.push_back(c);
+    buffer_.push_back(char(c));
   }
 
   return buffer_[buffer_.size() - 1];
@@ -770,8 +771,12 @@ void
 CHtmlParser::
 unreadChars(const std::string &str)
 {
-  for (int i = str.size() - 1; i >= 0; --i) {
-    if (str[i] == '\n') {
+  auto len = str.size();
+
+  while (len > 0) {
+    --len;
+
+    if (str[len] == '\n') {
       --lineNum_;
 
       charNum_ = 256;
@@ -779,7 +784,7 @@ unreadChars(const std::string &str)
     else
       --charNum_;
 
-    buffer_.push_back(str[i]);
+    buffer_.push_back(str[len]);
   }
 }
 
@@ -792,7 +797,7 @@ unreadChar(int c)
   else
     --charNum_;
 
-  buffer_.push_back(c);
+  buffer_.push_back(char(c));
 }
 
 void
@@ -847,9 +852,9 @@ void
 CHtmlParserTokens::
 clear()
 {
-  int num_tokens = tokens_.size();
+  auto num_tokens = tokens_.size();
 
-  for (int i = 0; i < num_tokens; i++)
+  for (decltype(num_tokens) i = 0; i < num_tokens; i++)
     delete tokens_[i];
 
   tokens_.clear();

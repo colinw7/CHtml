@@ -3,6 +3,7 @@
 
 #include <CHtmlTypes.h>
 #include <CFile.h>
+#include <CSafeIndex.h>
 
 #include <string>
 #include <vector>
@@ -19,11 +20,11 @@ class CHtmlParserTokens {
 
   void add(CHtmlToken *token);
 
-  int size() const { return tokens_.size(); }
+  size_t size() const { return tokens_.size(); }
 
   bool empty() const { return tokens_.empty(); }
 
-  const CHtmlToken *operator[](int i) const { return tokens_[i]; }
+  const CHtmlToken *operator[](int i) const { return CUtil::safeIndex(tokens_, i); }
 
   void clear();
 
@@ -80,16 +81,16 @@ class CHtmlParser {
   CHtmlParser &operator=(const CHtmlParser &rhs);
 
  private:
-  typedef std::vector<char>       Buffer;
-  typedef std::vector<CHtmlTag *> TagStack;
-  typedef std::unique_ptr<CFile>  FileP;
+  using Buffer   = std::vector<char>;
+  using TagStack = std::vector<CHtmlTag *>;
+  using FileP =   std::unique_ptr<CFile>;
 
   const CHtml&       html_;
   FileP              file_;
-  CHtmlParserTokens* tokens_ { nullptr };
+  CHtmlParserTokens* tokens_   { nullptr };
   TagStack           tagStack_;
   Buffer             buffer_;
-  bool               debug_ { false };
+  bool               debug_   { false };
   uint               lineNum_ { 1 };
   uint               charNum_ { 0 };
 };

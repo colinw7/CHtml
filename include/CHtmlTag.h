@@ -2,6 +2,7 @@
 #define CHtmlTag_H
 
 #include <CHtmlTypes.h>
+#include <CSafeIndex.h>
 #include <string>
 #include <vector>
 #include <sys/types.h>
@@ -22,8 +23,8 @@ class CHtmlTagOption {
 
 class CHtmlTag {
  public:
-  typedef std::vector<CHtmlTagOption *> OptionArray;
-  typedef std::vector<CHtmlToken *>     Children;
+  using OptionArray = std::vector<CHtmlTagOption *>;
+  using Children    = std::vector<CHtmlToken *>;
 
  public:
   CHtmlTag(const std::string &name, const OptionArray &options, bool end_tag);
@@ -36,11 +37,11 @@ class CHtmlTag {
 
   //---
 
-  uint getNumOptions() const { return options_.size(); }
+  size_t getNumOptions() const { return options_.size(); }
 
   const OptionArray &getOptions() const { return options_; }
 
-  const CHtmlTagOption *getOption(int i) const { return options_[i]; }
+  const CHtmlTagOption *getOption(int i) const { return CUtil::safeIndex(options_, i); }
 
   bool hasOptionName(const std::string &name) const;
 

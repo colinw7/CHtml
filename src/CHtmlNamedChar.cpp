@@ -172,7 +172,7 @@ bool
 CHtmlNamedCharMgr::
 lookup(int value, CHtmlNamedChar **named_char) const
 {
-  auto p = valueNameMap_.find(value);
+  auto p = valueNameMap_.find(uint(value));
 
   if (p == valueNameMap_.end())
     return false;
@@ -192,9 +192,9 @@ encodeString(const std::string &str) const
 
   std::string str1;
 
-  uint len = str.size();
+  auto len = str.size();
 
-  for (uint i = 0; i < len; ++i) {
+  for (decltype(len) i = 0; i < len; ++i) {
     if (strchr(encode_chars, str[i]) != NULL) {
       lookup(int(str[i]), &named_char);
 
@@ -215,12 +215,12 @@ decodeString(const std::string &istr, std::string &ostr) const
 {
   ostr = "";
 
-  uint len = istr.size();
+  auto len = istr.size();
 
-  for (uint i = 0; i < len; ++i) {
+  for (decltype(len) i = 0; i < len; ++i) {
     if (istr[i] == '&') {
-      uint j1 = i + 1;
-      uint j2 = j1;
+      auto j1 = i + 1;
+      auto j2 = j1;
 
       while (j2 < len && istr[j2] != ';')
         ++j2;

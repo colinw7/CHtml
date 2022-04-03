@@ -21,8 +21,8 @@ struct CHtmlNamedChar {
 
 class CHtmlNamedCharMgr {
  private:
-  typedef std::map<std::string,CHtmlNamedChar *> NameValueMap;
-  typedef std::map<int        ,CHtmlNamedChar *> ValueNameMap;
+  using NameValueMap = std::map<std::string,CHtmlNamedChar *>;
+  using ValueNameMap = std::map<uint       ,CHtmlNamedChar *>;
 
  public:
   static CHtmlNamedCharMgr *getInstance();

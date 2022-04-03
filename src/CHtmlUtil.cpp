@@ -29,8 +29,7 @@ listDirectory(CDir &dir, CFile &output, CHtmlFileMgr &file_mgr)
   else
     path1 = path;
 
-  output.printf("<a href='%s'>Up to higher level directory</a>\n",
-                path1.c_str());
+  output.printf("<a href='%s'>Up to higher level directory</a>\n", path1.c_str());
 
   /*------------*/
 
@@ -41,17 +40,17 @@ listDirectory(CDir &dir, CFile &output, CHtmlFileMgr &file_mgr)
 
   dir.getSortedFilenames(files);
 
-  int num = files.size();
+  auto num = files.size();
 
-  int max_len = 0;
+  size_t max_len = 0;
 
-  for (int i = 0; i < num; i++) {
-    int len = files[i].size();
+  for (decltype(num) i = 0; i < num; i++) {
+    auto len = files[i].size();
 
     max_len = std::max(max_len, len);
   }
 
-  for (int i = 0; i < num; ++i) {
+  for (decltype(num) i = 0; i < num; ++i) {
     CFile file(files[i]);
 
     CFileType file_type = file.getType();
@@ -59,18 +58,18 @@ listDirectory(CDir &dir, CFile &output, CHtmlFileMgr &file_mgr)
     type  = file_mgr.getTypeName (file_type);
     image = file_mgr.getTypeImage(file_type);
 
-    int len = files[i].size();
+    auto len = files[i].size();
 
-    std::string time_string = COSTime::getTimeString(CFile::getMTime(files[i]));
+    auto time_string = COSTime::getTimeString(CFile::getMTime(files[i]));
 
     output.printf(" <a href='file:%s/%s'><img src='%s'>%s</a>",
                   path .c_str(), files[i].c_str(),
                   image.c_str(), files[i].c_str());
 
-    output.printf("%*.*s %8lu %24.24s %s\n",
-                  max_len - len, max_len - len, " ",
-                  CFile::getSize(files[i]),
-                  time_string.c_str(), type.c_str());
+    auto pad_len = int(max_len - len);
+
+    output.printf("%*.*s %8lu %24.24s %s\n", pad_len, pad_len , " ",
+                  CFile::getSize(files[i]), time_string.c_str(), type.c_str());
   }
 
   /*------------*/
@@ -118,9 +117,9 @@ listTextFile(const std::string &filename, CFile &output)
 
   file.toLines(lines);
 
-  int num_lines = lines.size();
+  auto num_lines = lines.size();
 
-  for (int i = 0; i < num_lines; i++)
+  for (decltype(num_lines) i = 0; i < num_lines; i++)
     output.printf("%s\n", lines[i].c_str());
 
   /*------------*/
@@ -174,7 +173,7 @@ listBinaryFile(const std::string &filename, CFile &output)
       num_chars = 0;
     }
 
-    chars[num_chars++] = c;
+    chars[num_chars++] = char(c);
   }
 
   if (num_chars > 0) {
@@ -225,7 +224,7 @@ listScriptFile(const std::string &filename, CFile &output)
 
   CStrUtil::addWords(line, words);
 
-  int num_words = words.size();
+  auto num_words = words.size();
 
   CFileType type = CFILE_TYPE_TEXT_PLAIN;
 
@@ -242,7 +241,7 @@ listScriptFile(const std::string &filename, CFile &output)
 
   CStrUtil::addLines(command_output1, lines);
 
-  int num_lines = lines.size();
+  auto num_lines = lines.size();
 
   /*------------*/
 
@@ -255,7 +254,7 @@ listScriptFile(const std::string &filename, CFile &output)
   if (type == CFILE_TYPE_TEXT_PLAIN)
     output.printf("<xmp>\n");
 
-  for (int i = 0; i < num_lines; i++)
+  for (decltype(num_lines) i = 0; i < num_lines; i++)
     output.printf("%s\n", lines[i].c_str());
 
   if (type == CFILE_TYPE_TEXT_PLAIN)
