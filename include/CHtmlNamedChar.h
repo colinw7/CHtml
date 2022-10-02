@@ -8,8 +8,8 @@
 #define CHtmlNamedCharMgrInst CHtmlNamedCharMgr::getInstance()
 
 struct CHtmlNamedChar {
-  CHtmlNamedChar(const char *name, uint value, const char *str) :
-   name(name), value(value), str(str) {
+  CHtmlNamedChar(const char *name_, uint value_, const char *str_) :
+   name(name_), value(value_), str(str_) {
   }
 
   const char *name  { nullptr };
