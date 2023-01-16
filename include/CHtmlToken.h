@@ -38,7 +38,7 @@ class CHtmlCommentToken : public CHtmlToken {
  public:
   CHtmlCommentToken(CHtmlComment *comment);
 
-  CHtmlComment *getComment() const { return comment_; }
+  CHtmlComment *getComment() const override { return comment_; }
 
  private:
   CHtmlComment *comment_ { nullptr };
@@ -50,7 +50,7 @@ class CHtmlTagToken : public CHtmlToken {
  public:
   CHtmlTagToken(CHtmlTag *tag);
 
-  CHtmlTag *getTag() const { return tag_; }
+  CHtmlTag *getTag() const override { return tag_; }
 
  private:
   CHtmlTag *tag_ { nullptr };
@@ -62,7 +62,7 @@ class CHtmlTextToken : public CHtmlToken {
  public:
   CHtmlTextToken(CHtmlText *text);
 
-  CHtmlText *getText() const { return text_; }
+  CHtmlText *getText() const override { return text_; }
 
  private:
   CHtmlText *text_ { nullptr };
