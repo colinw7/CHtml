@@ -825,7 +825,7 @@ CHtmlTag *
 CHtmlParser::
 currentTag() const
 {
-  return (! tagStack_.empty() ? tagStack_.back() : 0);
+  return (! tagStack_.empty() ? tagStack_.back() : nullptr);
 }
 
 //--------------
